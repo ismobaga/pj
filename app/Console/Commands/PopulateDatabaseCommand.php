@@ -2,15 +2,15 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
-use function GuzzleHttp\json_decode;
-use App\Models\Category;
-use Illuminate\Support\Str;
-use App\Models\SubCategory;
-use App\Models\Company;
 use App\Models\Address;
+use App\Models\Company;
 use App\Models\Website;
+use App\Models\Category;
+use App\Models\SubCategory;
+use Illuminate\Support\Str;
+use Illuminate\Console\Command;
+use function GuzzleHttp\json_decode;
+use Illuminate\Filesystem\Filesystem;
 
 class PopulateDatabaseCommand extends Command
 {
@@ -29,7 +29,7 @@ class PopulateDatabaseCommand extends Command
      * @var string
      */
     protected $description = 'Command description';
-        
+
     /**
      * The filesystem instance.
      *
@@ -65,15 +65,15 @@ class PopulateDatabaseCommand extends Command
         }
 
         $jsonData = json_decode($this->files->get($path));
-        foreach($jsonData as $catData){
+        foreach ($jsonData as $catData) {
             $this->info($catData[0]->name);
-            $catAttrs = (array)$catData[0];
+            $catAttrs = (array) $catData[0];
             $catAttrs['slug'] = Str::slug($catData[0]->name);
             $category = new Category($catAttrs);
             $category->save();
 
             $subCatRel = $category->subCategories();
-            foreach($catData[1] as $subCatData){
+            foreach ($catData[1] as $subCatData) {
                 $subCatAttrs = [];
                 $subCatAttrs['name'] = trim(Str::before($subCatData->name, '- MALI'));
                 $subCatAttrs['slug'] = Str::slug($subCatData->name);
@@ -87,20 +87,20 @@ class PopulateDatabaseCommand extends Command
                     $cmpnyAttrs['name'] = $cmpnyData->name;
                     $cmpnyAttrs['slug'] = Str::slug($cmpnyData->name);
 
-                    $company =  Company::firstOrNew($cmpnyAttrs);
-                    if(! $company->exists){
+                    $company = Company::firstOrNew($cmpnyAttrs);
+                    if (! $company->exists) {
                         $company->save();
 
                         $compnyRel->syncWithoutDetaching([$company->id]);
                     }
                     $addr = [];
 
-                    $addr['city'] = Str::after($cmpnyData->address, "- ");
+                    $addr['city'] = Str::after($cmpnyData->address, '- ');
                     $addr['formatted_address'] = $cmpnyData->address;
                     $addr['country'] = Str::contains(Str::lower($cmpnyData->address), 'paris') ? 'France' : 'Mali';
 
                     // $company = new Company();
-                    
+
                     $address = new Address($addr);
 
                     $company->address()->save($address);
@@ -109,26 +109,21 @@ class PopulateDatabaseCommand extends Command
                     $emailr = null;
                     $email = null;
                     $websites = [];
-                    foreach (explode('\n', $cmpnyData->description[0]) as $info ) {
+                    foreach (explode('\n', $cmpnyData->description[0]) as $info) {
                         $info = trim($info);
                         $links = [];
-                        if (preg_match($EMAIL_PATTERN, $info, $emailr)==1) {
+                        if (preg_match($EMAIL_PATTERN, $info, $emailr) == 1) {
                             $email = $emailr[0];
-                            
-                        } else if (preg_match($URL_PATTERN, $info, $links )==1) {
+                        } elseif (preg_match($URL_PATTERN, $info, $links) == 1) {
                             $websites[] = new Website([
                                 'type' => Str::contains($links[0], 'facebook') ? 'Facebook' : 'Website',
                                 'url'  => $links[0],
                             ]);
-
                         } else {
-                            if($info){
-
+                            if ($info) {
                             }
-
-
                         }
-                        
+
                         if ($email) {
                             $company->email = $email;
                             $company->save();
@@ -136,15 +131,10 @@ class PopulateDatabaseCommand extends Command
 
                         $company->websites()->saveMany($websites);
                         $company->phones()->saveMany($phones);
-                        
                     }
-
                 }
             }
-
-
         }
-        
 
         $this->line("<info>Path to the Json file :</info> {$path}");
         //

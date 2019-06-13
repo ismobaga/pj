@@ -3,14 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class SubCategory extends Model
 {
     protected $fillable = ['name', 'slug'];
-
 
     /**
      * Get the category relationship.
@@ -22,7 +21,7 @@ class SubCategory extends Model
         return $this->belongsTo(Category::class);
     }
 
-     /**
+    /**
      * The companies.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
