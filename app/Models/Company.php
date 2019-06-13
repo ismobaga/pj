@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Company extends Model
 {
     protected $fillable = ['name', 'slug'];
+
     /**
      * Get all of the company's phones.
      */
@@ -52,5 +53,4 @@ class Company extends Model
     {
         return $this->subCategory()->category();
     }
-
 }

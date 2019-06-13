@@ -8,7 +8,7 @@ class Website extends Model
 {
     protected $fillable = ['type', 'url'];
 
-      /**
+    /**
      * Get all of the models that own websies.
      */
     public function websitable()
