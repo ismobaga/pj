@@ -3,14 +3,14 @@
 namespace App\Console\Commands;
 
 use App\Models\Address;
-use App\Models\Company;
-use App\Models\Website;
 use App\Models\Category;
+use App\Models\Company;
 use App\Models\SubCategory;
-use Illuminate\Support\Str;
-use Illuminate\Console\Command;
+use App\Models\Website;
 use function GuzzleHttp\json_decode;
+use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 
 class PopulateDatabaseCommand extends Command
 {
